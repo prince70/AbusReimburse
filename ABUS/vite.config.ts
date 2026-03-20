@@ -18,6 +18,11 @@ export default defineConfig({
       }
     }
   },
+  preview: {
+    port: 4173,
+    host: true,
+    allowedHosts: ['reimbursement.abushardware.com', 'localhost', '127.0.0.1']
+  },
   build: {
     outDir: 'dist',
     chunkSizeWarningLimit: 2000,
