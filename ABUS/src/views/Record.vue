@@ -162,7 +162,7 @@
 
           <div class="total-row">
             <div class="total-info">
-              <span>共 <strong>{{ form.items.length }}</strong> 条明细</span>
+              <span>共 <strong>{{ form.items.length }}</strong>条明细</span>
             </div>
             <div class="total-amount">
               合计金额：<span class="amount">¥{{ form.total_amount.toFixed(2) }}</span>

@@ -6,35 +6,64 @@ router = APIRouter()
 
 @router.get("/departments")
 def get_departments():
-    """获取部门列表 - 从用户表Department字段查询"""
+    """获取部门列表"""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT DISTINCT Department 
-        FROM [user] 
-        WHERE Department IS NOT NULL 
-          AND LTRIM(RTRIM(Department)) <> ''
-        ORDER BY Department
+        SELECT id, department
+        FROM Reimbursement.dbo.department
+        WHERE id BETWEEN 1 AND 15
+        ORDER BY id
     """)
     rows = cursor.fetchall()
-    result = [r[0] for r in rows]
+    result = [r[1] for r in rows] if rows else []
     conn.close()
     return {"code": 0, "data": result}
 
 
 @router.get("/categories")
 def get_categories():
-    categories = [
-        {"name": "交通费", "sub": ["出租车", "公交", "地铁", "火车", "飞机", "自驾"]},
-        {"name": "餐饮费", "sub": ["工作餐", "业务招待"]},
-        {"name": "住宿费", "sub": ["酒店", "招待所"]},
-        {"name": "办公费", "sub": ["文具", "耗材", "设备"]},
-        {"name": "通讯费", "sub": ["话费", "网费"]},
-        {"name": "培训费", "sub": ["课程", "教材", "考试"]},
-        {"name": "维修费", "sub": ["设备维修", "车辆维修"]},
-        {"name": "其他", "sub": []},
-    ]
-    return {"code": 0, "data": categories}
+    """获取类别及其子类"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    # 从 category 和 sub_category 表查询
+    cursor.execute("""
+        SELECT c.id, c.category, s.sub_category
+        FROM Reimbursement.dbo.category c
+        LEFT JOIN Reimbursement.dbo.sub_category s ON c.id = s.category_id
+        WHERE c.id BETWEEN 1 AND 22
+        ORDER BY c.id, s.id
+    """)
+    rows = cursor.fetchall()
+    cat_dict = {}
+    for r in rows:
+        cat_id = r[0]
+        cat_name = r[1] if r[1] else ''
+        sub_name = r[2] if r[2] else ''
+        if cat_name and cat_name not in cat_dict:
+            cat_dict[cat_name] = []
+        if cat_name and sub_name and sub_name not in cat_dict[cat_name]:
+            cat_dict[cat_name].append(sub_name)
+    result = [{"name": k, "sub": v} for k, v in cat_dict.items()]
+    conn.close()
+    return {"code": 0, "data": result}
+
+
+@router.get("/sub_categories")
+def get_sub_categories():
+    """获取所有子类 - 从 expense_items 表查询 sub_cat"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT DISTINCT sub_cat
+        FROM expense_items
+        WHERE sub_cat IS NOT NULL AND LTRIM(RTRIM(sub_cat)) <> ''
+        ORDER BY sub_cat
+    """)
+    rows = cursor.fetchall()
+    result = [r[0] for r in rows]
+    conn.close()
+    return {"code": 0, "data": result}
 
 
 @router.get("/workshops")

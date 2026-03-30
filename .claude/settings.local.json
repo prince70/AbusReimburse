@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:www.tinyash.com)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(curl -s http://localhost:8002/api/v1/categories)",
+      "Bash(curl -s http://localhost:8002/api/v1/departments)"
     ]
   }
 }
