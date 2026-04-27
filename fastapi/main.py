@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from database import ensure_expense_reports_updated_at_column
 from routers import auth, records, audit, finance, base
 
 logger = logging.getLogger(__name__)
@@ -22,6 +23,11 @@ allowed_origins = [
 async def unhandled_exception_handler(request: Request, exc: Exception):
     logger.exception("Unhandled error on %s %s", request.method, request.url.path)
     return JSONResponse(status_code=500, content={"detail": "服务器内部错误", "error": str(exc)})
+
+
+@api.on_event("startup")
+def ensure_schema():
+    ensure_expense_reports_updated_at_column()
 
 
 api.include_router(auth.router, prefix="/api/auth", tags=["认证"])
