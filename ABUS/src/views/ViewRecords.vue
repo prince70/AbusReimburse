@@ -65,6 +65,7 @@
         <el-table-column prop="sub_cat" label="子类" width="90" />
         <el-table-column prop="reason" label="事由" />
         <el-table-column prop="department" label="部门" width="100" />
+        <el-table-column prop="workshop" label="车间" width="100" v-if="detailItems.some(i => i.workshop)" />
         <el-table-column prop="amount" label="金额" width="100">
           <template #default="scope">¥{{ Number(scope.row.amount || 0).toFixed(2) }}</template>
         </el-table-column>
@@ -258,9 +259,10 @@ const printHtml = computed(() => {
             <h2 style="display: inline-block; margin: 0;">万晖五金（深圳）有限公司</h2>
           </div>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <h2 style="margin: 0;">报销单</h2>
-          <span style="font-size: 12pt;">流水号: ${String((rpt.id || 0) + 100).padStart(3, '0')}</span>
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <div style="flex: 1;"></div>
+          <h2 style="margin: 0; flex: 1; text-align: center;">报销单</h2>
+          <span style="flex: 1; text-align: right; font-size: 12pt;">流水号: ${String((rpt.id || 0) + 100).padStart(3, '0')}</span>
         </div>
         <div class="header-info" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
           <span>申请人: ${rpt.applicant ?? ''}</span>
@@ -291,15 +293,9 @@ const printHtml = computed(() => {
           </tr>
         </table>
         <div class="signature-section" style="display: flex; justify-content: space-around; margin-top: 40px;">
-          <div style="text-align: center;">
-            <div>申请人签字:</div>
-          </div>
-          <div style="text-align: center;">
-            <div>审核人签字:</div>
-          </div>
-          <div style="text-align: center;">
-            <div>出纳签字:</div>
-          </div>
+          <div style="text-align: center;"><span style="font-size: 12pt;">申请人签字:</span></div>
+          <div style="text-align: center;"><span style="font-size: 12pt;">审核人签字:</span></div>
+          <div style="text-align: center;"><span style="font-size: 12pt;">出纳签字:</span></div>
         </div>
       </body>
     </html>

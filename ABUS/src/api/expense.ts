@@ -86,6 +86,7 @@ export const expenseApi = {
   getCategories: () => http.get<any, any>('/api/v1/categories'),
   getSubCategories: () => http.get<any, any>('/api/v1/sub_categories'),
   getWorkshops: () => http.get<any, any>('/api/v1/workshops'),
+  getWorkshopsByDepartment: (department: string) => http.get<any, any>('/api/v1/workshops_by_department', { params: { department } }),
   getLicensePlates: () => http.get<any, any>('/api/v1/license_plates'),
 
   // Reports

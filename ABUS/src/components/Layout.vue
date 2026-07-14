@@ -75,9 +75,9 @@
       </el-header>
       <el-main class="main-content">
         <router-view v-slot="{ Component }">
-          <transition name="page" mode="out-in">
+          <!-- <transition name="page" mode="out-in"> -->
             <component :is="Component" :key="route.fullPath" />
-          </transition>
+          <!-- </transition> -->
         </router-view>
       </el-main>
     </el-container>

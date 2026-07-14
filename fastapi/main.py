@@ -16,6 +16,7 @@ allowed_origins = [
     "http://localhost:4173",
     "http://127.0.0.1:4173",
     "http://192.168.10.202:8083",
+    "http://reimbursement.abushardware.com",
 ]
 
 

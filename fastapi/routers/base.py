@@ -84,6 +84,22 @@ def get_workshops():
     return {"code": 0, "data": result}
 
 
+@router.get("/workshops_by_department")
+def get_workshops_by_department(department: str = Query(...)):
+    """根据部门获取车间列表"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT w.workshop FROM Reimbursement.dbo.workshop w
+        JOIN Reimbursement.dbo.department d ON w.department_id = d.id
+        WHERE d.department = ? ORDER BY w.workshop
+    """, department)
+    rows = cursor.fetchall()
+    result = [r[0] for r in rows]
+    conn.close()
+    return {"code": 0, "data": result}
+
+
 @router.get("/license_plates")
 def get_license_plates():
     conn = get_connection()

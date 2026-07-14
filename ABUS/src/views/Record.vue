@@ -118,6 +118,7 @@
             <div class="th-col sub-cat">子类</div>
             <div class="th-col reason">事由</div>
             <div class="th-col dept">部门</div>
+            <div class="th-col workshop" v-if="showWorkshopCol">车间</div>
             <div class="th-col amount">金额</div>
             <div class="th-col attach">附件</div>
             <div class="th-col action"></div>
@@ -142,8 +143,13 @@
                 <el-input v-model="item.reason" placeholder="请输入事由" size="small" />
               </div>
               <div class="td-col dept">
-                <el-select v-model="item.department" placeholder="部门" size="small" style="width:100%">
+                <el-select v-model="item.department" placeholder="部门" size="small" style="width:100%" @change="onDeptChange(item)">
                   <el-option v-for="d in departments" :key="d" :label="d" :value="d" />
+                </el-select>
+              </div>
+              <div class="td-col workshop" v-if="showWorkshopCol">
+                <el-select v-model="item.workshop" placeholder="车间" size="small" style="width:100%" clearable>
+                  <el-option v-for="w in deptWorkshops[item.department] || []" :key="w" :label="w" :value="w" />
                 </el-select>
               </div>
               <div class="td-col amount">
@@ -216,6 +222,7 @@
             <el-table-column prop="sub_cat" label="子类" width="90" />
             <el-table-column prop="reason" label="事由" />
             <el-table-column prop="department" label="部门" width="100" />
+            <el-table-column prop="workshop" label="车间" width="100" />
             <el-table-column prop="amount" label="金额" width="110">
               <template #default="{ row }">
                 <span class="amount">¥{{ Number(row.amount).toFixed(2) }}</span>
@@ -230,7 +237,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/user'
@@ -254,6 +261,20 @@ const detailVisible = ref(false)
 const detailData = ref<any>(null)
 const editingId = ref<number | null>(null)
 const formRef = ref<FormInstance>()
+const deptWorkshops = ref<Record<string, string[]>>({})
+
+const showWorkshopCol = computed(() =>
+  form.items.some(item => item.department && deptWorkshops.value[item.department]?.length > 0)
+)
+
+async function onDeptChange(item: any) {
+  item.workshop = ''
+  if (!item.department) return
+  if (!deptWorkshops.value[item.department]) {
+    const res = await expenseApi.getWorkshopsByDepartment(item.department)
+    deptWorkshops.value[item.department] = res.code === 0 ? res.data : []
+  }
+}
 
 const form = reactive({
   input_date: dayjs().format('YYYY-MM-DD'),
@@ -284,7 +305,7 @@ function addItem() {
     category: '',
     sub_cat: '',
     reason: '',
-    department: userStore.userInfo?.department || '',
+    department: '',
     workshop: userStore.userInfo?.workshop || '',
     licence: '',
     invoice: '',
@@ -322,6 +343,7 @@ async function loadRecords() {
 
 function openCreate() {
   editingId.value = null
+  deptWorkshops.value = {}
   Object.assign(form, {
     input_date: dayjs().format('YYYY-MM-DD'),
     approver_id: undefined,
@@ -337,6 +359,7 @@ async function editRecord(row: any) {
   const res = await expenseApi.getRecord(row.id)
   if (res.code !== 0) return
   editingId.value = row.id
+  deptWorkshops.value = {}
   Object.assign(form, {
     input_date: res.data.input_date,
     approver_id: res.data.approver_id,
@@ -344,6 +367,12 @@ async function editRecord(row: any) {
     total_amount: Number(res.data.total_amount),
     items: res.data.items.map((i: any) => ({ ...i, amount: Number(i.amount) }))
   })
+  for (const item of form.items) {
+    if (item.department) {
+      const r = await expenseApi.getWorkshopsByDepartment(item.department)
+      if (r.code === 0 && r.data.length > 0) deptWorkshops.value[item.department] = r.data
+    }
+  }
   dialogVisible.value = true
 }
 
@@ -551,6 +580,7 @@ onMounted(async () => {
 .th-col.sub-cat, .td-col.sub-cat { width: 90px; flex-shrink: 0; }
 .th-col.reason, .td-col.reason { flex: 1; min-width: 120px; }
 .th-col.dept, .td-col.dept { width: 100px; flex-shrink: 0; }
+.th-col.workshop, .td-col.workshop { width: 100px; flex-shrink: 0; }
 .th-col.amount, .td-col.amount { width: 100px; flex-shrink: 0; }
 .th-col.attach, .td-col.attach { width: 80px; flex-shrink: 0; text-align: center; }
 .th-col.action, .td-col.action { width: 50px; flex-shrink: 0; text-align: center; }
