@@ -32,8 +32,8 @@ if %errorlevel% equ 0 (
 echo.
 
 echo 正在重启后端...
-:: 停止旧后端进程
-taskkill /f /im python.exe >nul 2>nul
+:: 停止旧后端进程（只杀 ABUS Backend 窗口）
+taskkill /fi "WINDOWTITLE eq ABUS Backend" /f >nul 2>nul
 :: 启动新后端
 start "ABUS Backend" cmd /c "cd /d D:\Web\Reimbursement\fastapi && python main.py"
 if %errorlevel% equ 0 (
