@@ -2,7 +2,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
 const http = axios.create({
-  baseURL: import.meta.env.PROD ? 'http://192.168.10.202:8002' : '',
+  baseURL: import.meta.env.PROD ? '/api' : '',
   timeout: 15000
 })
 
