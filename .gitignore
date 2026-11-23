@@ -1,0 +1,29 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.venv/
+
+# ===== Node / 前端 =====
+node_modules/
+ABUS/dist/
+npm-debug.log*
+
+# ===== 本机环境配置（开发机 / 服务器各自维护，绝对不上传仓库） =====
+.env
+.env.*
+*.local.ps1
+
+# ===== 运行时产物 =====
+logs/
+*.log
+
+# ===== AI / IDE =====
+.claude/
+.vscode/
+.idea/
+
+# ===== 系统文件 =====
+Thumbs.db
+.DS_Store
